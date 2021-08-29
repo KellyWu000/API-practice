@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>請選擇想查詢的地區</h1>
+    <select class="area"></select>
+    <p>溫度: <span class="tem"></span></p>
+    <p>體感溫度: <span class="feel-like"></span></p>
+    <p>濕度: <span class="humidity"></span></p>
+
+    <script>
+      var area = document.querySelector(".area");
+      var tem = document.querySelector(".tem");
+      var fellLike = document.querySelector(".feel-like");
+      var humidity = document.querySelector(".humidity");
+      
+      area.addEventListener("change", showWeather);
+
+     
+      var arr = [];
+      function getWeather() {
+        
+
+      //fetch
+        fetch(
+          "https://api.openweathermap.org/data/2.5/box/city?bbox=120,19,122,30,10&appid=cb9de36bbd3a6969b700004716fd3036"
+        )
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data);
+            arr = data.list;
+            console.log(arr);
+
+            showWeather();
+
+         
+            var len = arr.length;
+            console.log(len);
+            var str="";
+            for (var i = 0; i < len; i++) {
+              //方法一使用appendChild
+              // var city = arr[i].name;
+              // var option = document.createElement("option");
+              // option.textContent = city;
+              // area.appendChild(option);
+              
+            //方法二組字串
+              str+=`<option value=${arr[i].name}>${arr[i].name}</option>`;
+                          }
+              area.innerHTML=str;
+            var optionItem = document.querySelectorAll("option");
+
+            
+            for (var j = 0; j < optionItem.length; j++) {
+              if (optionItem[j].textContent == "Taipei") {
+                optionItem[j].selected = true;
+              }
+            }
+          });
+        //因為 option 是程式產生的，所以預設是會依據資料顯示
+
+        // 則要跑 for 迴圈和 if 判斷是否為指定的 option
+
+        // 可參考下圖修改後的結果
+
+        // 圖片中的 selected 則是可指定 option 為預設值
+        // document.getElementById("sel")[2].selected=true;
+      }
+
+      getWeather();
+
+      //選擇城市後，顯示相對應天氣狀況
+
+      function showWeather(e) {
+        var select;
+        if (!e) {
+          select = "Taipei"; //沒點擊時就是預設
+        } else {
+          select = e.target.value;
+        }
+        // var dataObject = JSON.parse(xhr.responseText);
+
+        console.log(arr);
+   
+        var len = arr.length;
+        // var len = dataObject.list.length;
+        for (var i = 0; i < len; i++) {
+          var temList = arr[i].main.temp;
+          var fellLikeList = arr[i].main.feels_like;
+          var humidityList = arr[i].main.humidity;
+
+          if (select == arr[i].name) {
+            tem.textContent = temList + "度";
+            fellLike.textContent = fellLikeList + "度";
+            humidity.textContent = humidityList;
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

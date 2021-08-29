@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>請選擇想查詢的地區</h1>
+    <select class="area"></select>
+    <p>溫度: <span class="tem"></span></p>
+    <p>體感溫度: <span class="feel-like"></span></p>
+    <p>濕度: <span class="humidity"></span></p>
+
+    <script>
+      var area = document.querySelector(".area");
+var tem = document.querySelector(".tem");
+var fellLike = document.querySelector(".feel-like");
+var humidity = document.querySelector(".humidity");
+var xhr = new XMLHttpRequest();
+area.addEventListener("change", showWeather);
+
+//串接台灣天氣api，將城市名稱代入html的選單中
+
+function getWeather() {
+  xhr.open(
+    "get",
+    "https://api.openweathermap.org/data/2.5/box/city?bbox=120,19,122,30,10&appid=cb9de36bbd3a6969b700004716fd3036",
+    true
+  );
+  xhr.send(null);
+  xhr.onload = function () {
+    var dataObject = JSON.parse(xhr.responseText); //回傳的資料
+    var len = dataObject.list.length;
+    for (var i = 0; i < len; i++) {
+      var city = dataObject.list[i].name;
+      var option = document.createElement("option");
+      option.textContent = city;
+      area.appendChild(option);
+    }
+    // 因為 option 是程式產生的，所以預設是會依據資料顯示
+
+    // 若要讓它預設顯示指定的 option 台北市
+
+    // 則要跑 for 迴圈和 if 判斷是否為指定的 option
+
+    var optionItem = document.querySelectorAll("option");
+    for (var j = 0; j < optionItem.length; j++) {
+      if (optionItem[j].textContent == 'Taipei') {
+        optionItem[j].selected = true;
+        
+      }
+    }
+    showWeather();
+  };
+}
+getWeather();
+
+//選擇城市後，顯示相對應天氣狀況
+function showWeather(e) {
+  var select;
+  if (!e) {
+    select = "Taipei";
+  } else {
+    select = e.target.value;
+  }
+  var dataObject = JSON.parse(xhr.responseText);
+  var len = dataObject.list.length;
+  for (var i = 0; i < len; i++) {
+    var temList = dataObject.list[i].main.temp;
+    var fellLikeList = dataObject.list[i].main.feels_like;
+    var humidityList = dataObject.list[i].main.humidity;
+
+    if (select == dataObject.list[i].name) {
+      tem.textContent = temList + "度";
+      fellLike.textContent = fellLikeList + "度";
+      humidity.textContent = humidityList;
+    }
+  }
+}
+
+      </script>
+  </body>
+</html>
